@@ -470,7 +470,7 @@ const Dashboard: React.FC = () => {
                 </TableContainer>
               </Paper>
             )}
-            {/* Remove Attendance History, Fines, and Payment History sections (or update to use real data if needed) */}
+            {/* Remove Attendance History, Fines, and Payment History sections */}
           </>
         )}
       </Box>

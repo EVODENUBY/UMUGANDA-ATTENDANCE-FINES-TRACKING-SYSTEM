@@ -501,7 +501,7 @@ const AdminPanel: React.FC = () => {
   // Fetch fines from backend
   const fetchFines = async () => {
     try {
-      const res = await axios.get('https://uats-backend.onrender.com//api/fines');
+      const res = await axios.get('https://uats-backend.onrender.com/api/fines');
       let finesArray: any[] = [];
       if (Array.isArray(res.data)) {
         finesArray = res.data;
