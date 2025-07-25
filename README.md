@@ -33,13 +33,13 @@ UATS is a robust, full-stack web application designed to manage Umuganda (commun
 - **Responsive Design:**
   - Fully mobile-friendly, with adaptive navigation and tables.
 - **Security:**
-  - Role-based access (admin, leader, official, citizen).
+  - Role-based access (admin, leader, citizen).
   - Authentication and protected routes.
 
 ---
 
 ## How It Works
-### Architecture
+### 
 - **Frontend:** React (TypeScript), Material-UI, React Router, Context API for state management.
 - **Backend:** Node.js, Express, MongoDB (Mongoose), RESTful API.
 - **Payment APIs:** MTN MoMo & Airtel Money (sandbox and real integration ready).
@@ -74,6 +74,7 @@ UATS is a robust, full-stack web application designed to manage Umuganda (commun
    - Install dependencies: `npm install`
    - Create a `.env` file with MongoDB URI and payment API credentials (see `.env.example`)
    - Start backend: `npm start` (default: http://localhost:8000)
+
 3. **Frontend Setup:**
    - Navigate to `uats-frontend/`
    - Install dependencies: `npm install`
@@ -95,20 +96,5 @@ UATS is a robust, full-stack web application designed to manage Umuganda (commun
 - Pay fines directly from your dashboard.
 - Receive notifications for upcoming sessions.
 
----
-
-## Contribution & Contact
-- Contributions are welcome! Please fork the repo and submit a pull request.
-- For questions or support, contact the project maintainer at [your-email@example.com].
-
----
-
-## Notes for Markers
-- The project is designed for robustness, extensibility, and real-world deployment (supports real payment APIs).
-- All business logic is handled in the backend for data integrity.
-- The UI is modern, responsive, and user-friendly, with clear role separation.
-- The codebase is well-structured and commented for easy understanding and extension.
-
----
 
 Enjoy using the Umuganda Attendance and Fines Tracking System! 
