@@ -1,0 +1,129 @@
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import axios from 'axios';
+
+export type Citizen = {
+  name?: string; // for legacy/local
+  nid?: string; // for legacy/local
+  fullName?: string; // for backend
+  nationalId?: string; // for backend
+  phone: string;
+  village: string;
+  sector: string;
+  username: string;
+  password: string;
+  active?: boolean;
+  _id?: string; // Added for backend interaction
+};
+
+interface CitizenContextType {
+  citizens: Citizen[];
+  addCitizen: (citizen: Citizen) => void;
+  updateCitizen: (idx: number, citizen: Citizen) => void;
+  deleteCitizen: (idx: number) => void;
+  setCitizens: (citizens: Citizen[]) => void;
+}
+
+const CitizenContext = createContext<CitizenContextType | undefined>(undefined);
+
+const initialCitizens: Citizen[] = (() => {
+  const stored = localStorage.getItem('citizens');
+  if (stored) return JSON.parse(stored);
+  return [
+    { name: 'EVODE MUYISINGIZE', nid: '1200380097272049', phone: '0791783308', village: 'RURAMBI', sector: 'MANAYAGIRO', username: '120080046466466', password: 'UATS@001', active: true },
+    { name: 'AMIZERO Patrick', nid: '120080046466467', phone: '0791783308', village: 'KIYOVU', sector: 'KIGALI', username: '120080046466467', password: 'UATS@002', active: true },
+  ];
+})();
+
+export const CitizenProvider = ({ children }: { children: ReactNode }) => {
+  const [citizens, setCitizens] = useState<Citizen[]>([]);
+
+  // Fetch citizens from backend on mount
+  React.useEffect(() => {
+    const fetchCitizens = async () => {
+      try {
+        const res = await axios.get('http://localhost:8000/api/citizens');
+        setCitizens(
+          (res.data as Citizen[]).map(c => ({
+            ...c,
+            nationalId: c.nationalId || c.nid,
+            nid: c.nid || c.nationalId,
+            fullName: c.fullName || c.name,
+            name: c.name || c.fullName,
+          }))
+        );
+      } catch (err) {
+        // handle error
+      }
+    };
+    fetchCitizens();
+  }, []);
+
+  const addCitizen = async (citizen: Citizen) => {
+    try {
+      await axios.post('http://localhost:8000/api/citizens', citizen);
+      const res = await axios.get('http://localhost:8000/api/citizens');
+      setCitizens(
+        (res.data as Citizen[]).map(c => ({
+          ...c,
+          nationalId: c.nationalId || c.nid,
+          nid: c.nid || c.nationalId,
+          fullName: c.fullName || c.name,
+          name: c.name || c.fullName,
+        }))
+      );
+    } catch (err) {
+      // handle error
+    }
+  };
+  const updateCitizen = async (idx: number, citizen: Citizen) => {
+    try {
+      const id = citizens[idx]?._id;
+      if (!id) return;
+      await axios.put(`http://localhost:8000/api/citizens/${id}`, citizen);
+      const res = await axios.get('http://localhost:8000/api/citizens');
+      setCitizens(
+        (res.data as Citizen[]).map(c => ({
+          ...c,
+          nationalId: c.nationalId || c.nid,
+          nid: c.nid || c.nationalId,
+          fullName: c.fullName || c.name,
+          name: c.name || c.fullName,
+        }))
+      );
+    } catch (err) {
+      // handle error
+    }
+  };
+  const deleteCitizen = async (idx: number) => {
+    try {
+      const id = citizens[idx]?._id;
+      if (!id) return;
+      await axios.delete(`http://localhost:8000/api/citizens/${id}`);
+      const res = await axios.get('http://localhost:8000/api/citizens');
+      setCitizens(
+        (res.data as Citizen[]).map(c => ({
+          ...c,
+          nationalId: c.nationalId || c.nid,
+          nid: c.nid || c.nationalId,
+          fullName: c.fullName || c.name,
+          name: c.name || c.fullName,
+        }))
+      );
+    } catch (err) {
+      // handle error
+    }
+  };
+
+  return (
+    <CitizenContext.Provider value={{ citizens, addCitizen, updateCitizen, deleteCitizen, setCitizens }}>
+      {children}
+    </CitizenContext.Provider>
+  );
+};
+
+export const useCitizens = () => {
+  const stored = useContext(CitizenContext);
+  if (!stored) throw new Error('useCitizens must be used within a CitizenProvider');
+  return stored;
+}; 
+export default CitizenContext;
