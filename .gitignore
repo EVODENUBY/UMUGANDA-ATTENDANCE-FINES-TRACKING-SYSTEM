@@ -3,14 +3,18 @@ node_modules/
 **/node_modules/
 
 # Build output
-dist/
 build/
-**/dist/
+dist/
 **/build/
+**/dist/
 
 # Environment variables
 .env
 .env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 **/.env
 **/.env.*
 
@@ -42,7 +46,7 @@ npm-debug.log
 **/npm-debug.log
 **/*.log
 
-# Platform-specific
+# Next.js, Vercel, Netlify, Render, Parcel, Turbo
 .next/
 .cache/
 .vercel/
@@ -60,5 +64,4 @@ npm-debug.log
 **/.sass-cache/
 **/.eslintcache
 **/.parcel-cache
-**/.turbo/
-
+**/.turbo/ 
