@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     // Citizens must log in with National ID and password from the backend
     try {
-      const res = await axios.post('http://localhost:8000/api/citizens/login', { username, password });
+      const res = await axios.post('https://uats-backend.onrender.com/api/citizens/login', { username, password });
       const citizen: any = res.data;
       if (citizen?.nationalId === username && citizen?.password === password) {
         const userObj: User = { name: citizen?.fullName, username: citizen?.nationalId, role: 'citizen' };

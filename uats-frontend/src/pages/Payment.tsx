@@ -39,7 +39,7 @@ const Payment: React.FC = () => {
       // Update attendance as before
       updateAttendance(fine.sessionId, user.username, 'Absent', fine.amount, 'Paid');
       // Update fine in backend with payment info
-      await axios.put(`http://localhost:8000/api/fines`, {
+      await axios.put(`https://uats-backend.onrender.com/api/fines`, {
         citizenId: user.username,
         sessionId: fine.sessionId,
         status: 'Paid',

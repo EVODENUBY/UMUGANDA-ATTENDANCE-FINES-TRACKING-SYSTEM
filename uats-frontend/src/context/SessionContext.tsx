@@ -38,7 +38,7 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
   // Fetch sessions from backend on mount and whenever citizens change
   const fetchSessions = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/sessions');
+      const res = await axios.get('https://uats-backend.onrender.com/api/sessions');
       setSessions(res.data as UmugandaSession[]);
     } catch (err) {
       // handle error
@@ -53,7 +53,7 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
     // Always use the latest citizens list for attendance
     const attendance = (citizens || []).map(c => ({ citizenNid: c.nationalId || c.nid, status: 'Absent' as AttendanceStatus }));
     try {
-      const res = await axios.post('http://localhost:8000/api/sessions', { ...session, attendance });
+      const res = await axios.post('https://uats-backend.onrender.com/api/sessions', { ...session, attendance });
       setSessions(prev => [...prev, res.data as UmugandaSession]);
     } catch (err) {
       // handle error
@@ -64,7 +64,7 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
   const updateSession = async (sessionId: string, session: UmugandaSession) => {
     try {
       const id = session._id || sessionId;
-      const res = await axios.put(`http://localhost:8000/api/sessions/${id}`, session);
+      const res = await axios.put(`https://uats-backend.onrender.com/api/sessions/${id}`, session);
       setSessions(prev => prev.map(s => s.sessionId === sessionId ? (res.data as UmugandaSession) : s));
     } catch (err) {
       // handle error
@@ -96,7 +96,7 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
     try {
       const session = sessions.find(s => s.sessionId === sessionId);
       const id = session?._id || sessionId;
-      await axios.delete(`http://localhost:8000/api/sessions/${id}`);
+      await axios.delete(`https://uats-backend.onrender.com/api/sessions/${id}`);
       setSessions(prev => {
         const updated = prev.filter(s => s._id !== id);
         return updated;

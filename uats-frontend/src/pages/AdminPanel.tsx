@@ -36,8 +36,6 @@ import axios from 'axios';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-// trendsData already uses context sessions
-
 // Add a type for fine row
 export interface FineRow {
   user: string;
@@ -88,9 +86,7 @@ const AdminPanel: React.FC = () => {
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [loadingEdit, setLoadingEdit] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
-  // Remove the password dialog logic from admin panel
-  // Remove setShowPasswordDialog, setRegisteredNid, setGeneratedPassword, and Dialog component from admin panel
-
+  
   // Citizens Table Pagination
   const [citizensPage, setCitizensPage] = useState(0);
   const [citizensRowsPerPage, setCitizensRowsPerPage] = useState(5);
@@ -151,7 +147,6 @@ const AdminPanel: React.FC = () => {
     a.click();
     window.URL.revokeObjectURL(url);
   };
-  // Remove handleDownloadCitizensPDF and the Download Citizens (PDF) button
 
   const handleCSVImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -176,7 +171,7 @@ const AdminPanel: React.FC = () => {
             password,
           };
           try {
-            await axios.post('http://localhost:8000/api/citizens', newCitizen);
+            await axios.post('https://uats-backend.onrender.com/api/citizens', newCitizen);
             await addCitizenToSessions(newCitizen); // Add to all sessions
             added++;
           } catch (error) {
@@ -231,7 +226,7 @@ const AdminPanel: React.FC = () => {
       password: newPassword,
     };
     try {
-      await axios.post('http://localhost:8000/api/citizens', newCitizen);
+      await axios.post('https://uats-backend.onrender.com/api/citizens', newCitizen);
       setCitizenForm({ name: '', nid: '', phone: '', village: '', sector: '' });
       setSnackbarMsg('Citizen registered successfully!');
       setSnackbarColor('success');
@@ -249,7 +244,7 @@ const AdminPanel: React.FC = () => {
   const handleEditCitizen = (idx: number) => {
     setEditIdx(idx);
     setEditForm({
-      // citizenId: citizens[idx].citizenId, // Remove this line, not needed
+    
       fullName: citizens[idx].fullName || '',
       nationalId: citizens[idx].nationalId || '',
       phone: citizens[idx].phone || '',
@@ -278,7 +273,7 @@ const AdminPanel: React.FC = () => {
         password: editForm.password,
       };
       try {
-        await axios.put(`http://localhost:8000/api/citizens/${citizen._id}`, updatedCitizen);
+        await axios.put(`https://uats-backend.onrender.com/api/citizens/${citizen._id}`, updatedCitizen);
         setEditIdx(null);
         setSnackbarMsg('Citizen updated successfully!');
         setSnackbarColor('success');
@@ -297,7 +292,7 @@ const AdminPanel: React.FC = () => {
     setLoadingDelete(true);
     const citizen = citizens[idx];
     try {
-      await axios.delete(`http://localhost:8000/api/citizens/${citizen._id}`);
+      await axios.delete(`https://uats-backend.onrender.com//api/citizens/${citizen._id}`);
       setSnackbarMsg('Citizen deleted successfully!');
       setSnackbarColor('success');
       setSnackbarOpen(true);
@@ -337,7 +332,7 @@ const AdminPanel: React.FC = () => {
   // Fetch citizens from backend
   const fetchCitizens = async () => {
     try {
-      const res = await axios.get<any[]>('http://localhost:8000/api/citizens');
+      const res = await axios.get<any[]>('https://uats-backend.onrender.com/api/citizens');
       // setCitizens(res.data); // This line was removed as per the edit hint
     } catch (err) {
       // handle error, do not call setCitizens
@@ -506,7 +501,7 @@ const AdminPanel: React.FC = () => {
   // Fetch fines from backend
   const fetchFines = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/fines');
+      const res = await axios.get('https://uats-backend.onrender.com//api/fines');
       let finesArray: any[] = [];
       if (Array.isArray(res.data)) {
         finesArray = res.data;

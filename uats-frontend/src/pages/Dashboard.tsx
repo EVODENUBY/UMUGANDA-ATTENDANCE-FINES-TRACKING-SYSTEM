@@ -38,7 +38,7 @@ const Dashboard: React.FC = () => {
     const fetchFines = async () => {
       if (!user?.username) return;
       try {
-        const res = await axios.get('http://localhost:8000/api/fines');
+        const res = await axios.get('https://uats-backend.onrender.com/api/fines');
         let finesArray: any[] = [];
         if (Array.isArray(res.data)) {
           finesArray = res.data;
@@ -102,7 +102,7 @@ const Dashboard: React.FC = () => {
         method,
         phone,
       });
-      await axios.post('http://localhost:8000/api/payments/initiate', {
+      await axios.post('https://uats-backend.onrender.com/api/payments/initiate', {
         citizenId: user?.username,
         sessionId: fine.sessionId,
         amount: fine.amount,

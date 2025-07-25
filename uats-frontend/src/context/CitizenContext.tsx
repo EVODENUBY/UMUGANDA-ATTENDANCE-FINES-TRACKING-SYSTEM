@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import axios from 'axios';
 
 export type Citizen = {
-  name?: string; // for legacy/local
-  nid?: string; // for legacy/local
+  name?: string;
+  nid?: string; 
   fullName?: string; // for backend
   nationalId?: string; // for backend
   phone: string;
@@ -41,7 +41,7 @@ export const CitizenProvider = ({ children }: { children: ReactNode }) => {
   React.useEffect(() => {
     const fetchCitizens = async () => {
       try {
-        const res = await axios.get('http://localhost:8000/api/citizens');
+        const res = await axios.get('https://uats-backend.onrender.com/api/citizens');
         setCitizens(
           (res.data as Citizen[]).map(c => ({
             ...c,
@@ -60,8 +60,8 @@ export const CitizenProvider = ({ children }: { children: ReactNode }) => {
 
   const addCitizen = async (citizen: Citizen) => {
     try {
-      await axios.post('http://localhost:8000/api/citizens', citizen);
-      const res = await axios.get('http://localhost:8000/api/citizens');
+      await axios.post('https://uats-backend.onrender.com/api/citizens', citizen);
+      const res = await axios.get('https://uats-backend.onrender.com/api/citizens');
       setCitizens(
         (res.data as Citizen[]).map(c => ({
           ...c,
@@ -79,8 +79,8 @@ export const CitizenProvider = ({ children }: { children: ReactNode }) => {
     try {
       const id = citizens[idx]?._id;
       if (!id) return;
-      await axios.put(`http://localhost:8000/api/citizens/${id}`, citizen);
-      const res = await axios.get('http://localhost:8000/api/citizens');
+      await axios.put(`https://uats-backend.onrender.com/api/citizens/${id}`, citizen);
+      const res = await axios.get('https://uats-backend.onrender.com/api/citizens');
       setCitizens(
         (res.data as Citizen[]).map(c => ({
           ...c,
@@ -98,8 +98,8 @@ export const CitizenProvider = ({ children }: { children: ReactNode }) => {
     try {
       const id = citizens[idx]?._id;
       if (!id) return;
-      await axios.delete(`http://localhost:8000/api/citizens/${id}`);
-      const res = await axios.get('http://localhost:8000/api/citizens');
+      await axios.delete(`https://uats-backend.onrender.com/api/citizens/${id}`);
+      const res = await axios.get('https://uats-backend.onrender.com/api/citizens');
       setCitizens(
         (res.data as Citizen[]).map(c => ({
           ...c,

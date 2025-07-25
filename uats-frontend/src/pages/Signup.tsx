@@ -42,9 +42,9 @@ const Signup: React.FC = () => {
       password: newPassword,
     };
     try {
-      await axios.post('http://localhost:8000/api/citizens', newCitizen);
+      await axios.post('https://uats-backend.onrender.com/api/citizens', newCitizen);
       // Add to all sessions for attendance
-      const sessionsRes = await axios.get('http://localhost:8000/api/sessions');
+      const sessionsRes = await axios.get('https://uats-backend.onrender.com/api/sessions');
       const sessions = Array.isArray(sessionsRes.data) ? sessionsRes.data : [];
       for (const session of sessions) {
         const alreadyExists = (session.attendance || []).some((a: any) => a.citizenNid === newCitizen.nationalId);
@@ -53,7 +53,7 @@ const Signup: React.FC = () => {
             ...(session.attendance || []),
             { citizenNid: newCitizen.nationalId, status: 'Absent' as 'Absent' }
           ];
-          await axios.put(`http://localhost:8000/api/sessions/${session._id || session.sessionId}`, { ...session, attendance: updatedAttendance });
+          await axios.put(`https://uats-backend.onrender.com/api/sessions/${session._id || session.sessionId}`, { ...session, attendance: updatedAttendance });
         }
       }
       setGeneratedPassword(newPassword);
