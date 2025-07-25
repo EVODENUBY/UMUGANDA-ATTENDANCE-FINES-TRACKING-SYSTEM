@@ -18,9 +18,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Hardcoded Acocunts  for Admin
+//  Acocunts  for Admin
 const users = [
-  { username: 'admin', password: 'admin', name: 'SystemAdmin EVODE', role: 'admin' as const },
+  { username: 'evodenuby', password: 'evode@123', name: 'SystemAdmin EVODE', role: 'admin' as const },
 ];
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { citizens } = useCitizens();
 
   const login = async (username: string, password: string) => {
-    // Only allow mocked users for admin/leader/official/citizens
+    // Only allow users for admin
     const found = users.find(u => u.username === username && u.password === password);
     if (found) {
       const userObj: User = { name: found.name, username: found.username, role: found.role };

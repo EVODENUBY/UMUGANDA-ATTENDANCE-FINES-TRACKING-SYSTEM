@@ -90,6 +90,7 @@ const Dashboard: React.FC = () => {
 
   // Add handleInitiatePayment function
   const handleInitiatePayment = async (method: string, fineIdx: number) => {
+    if (!user?.username) return;
     // Force blur on all inputs (for mobile)
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     const fine = fines[fineIdx];
@@ -109,7 +110,13 @@ const Dashboard: React.FC = () => {
         method,
         phone,
       });
-      // Optionally show a confirmation or redirect
+      // Refetch fines after payment initiation
+      const res = await axios.get('https://uats-backend.onrender.com/api/fines');
+      let finesArray: any[] = [];
+      if (Array.isArray(res.data)) {
+        finesArray = res.data;
+      }
+      setFines(finesArray.filter(f => f.citizenId === user.username));
       navigate(`/pay?fine=${fineIdx}&method=${method}`);
     } catch (err) {
       alert('Failed to initiate payment.');

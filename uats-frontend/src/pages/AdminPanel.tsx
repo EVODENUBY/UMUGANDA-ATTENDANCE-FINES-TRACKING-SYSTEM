@@ -418,7 +418,7 @@ const AdminPanel: React.FC = () => {
     setSnackbarMsg('Fine status overridden!');
     setSnackbarColor('success');
     setSnackbarOpen(true);
-    fetchFines();
+    fetchFines(); // Refetch fines after override
   };
 
   // Add a function to delete an attendance record for a citizen in a session
@@ -434,6 +434,7 @@ const AdminPanel: React.FC = () => {
     setSnackbarMsg('Attendance record deleted!');
     setSnackbarColor('success');
     setSnackbarOpen(true);
+    fetchFines(); // Refetch fines after attendance delete
   };
 
   // Define trendsData using context sessions
