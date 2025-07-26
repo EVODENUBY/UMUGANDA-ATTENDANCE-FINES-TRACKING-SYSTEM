@@ -98,9 +98,14 @@ router.put('/:id', async (req, res) => {
 // Delete a session by _id
 router.delete('/:id', async (req, res) => {
   try {
+    // Find the session to get its sessionId
+    const session = await Session.findById(req.params.id);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+    // Delete all fines associated with this session
+    await Fine.deleteMany({ sessionId: session.sessionId });
+    // Delete the session itself
     const deleted = await Session.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ error: 'Session not found' });
-    res.json({ message: 'Session deleted' });
+    res.json({ message: 'Session and associated fines deleted' });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
