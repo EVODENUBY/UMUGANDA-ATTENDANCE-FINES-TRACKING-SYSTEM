@@ -4,6 +4,7 @@ import { useSessions } from '../context/SessionContext';
 import { Container, Typography, Paper, Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Card, CardContent, Chip, IconButton, InputAdornment, Stack, Alert } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -13,21 +14,32 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 
 const AttendanceManagement: React.FC = () => {
-  const { sessions, updateAttendance } = useSessions();
+  const { sessions, updateAttendance, updateSession } = useSessions();
   const { citizens } = useCitizens();
   const [search, setSearch] = useState('');
   const [sortAsc, setSortAsc] = useState(true);
   // Use the latest session as the current session
   const currentSession = sessions.length > 0 ? sessions[sessions.length - 1] : null;
 
-  // Attendance list for the current session (from backend)
+  // Attendance list for the current session (from backend) - show all records including deleted citizens
   const attendanceList = currentSession ? (currentSession.attendance || []).map(a => ({ ...a })) : [];
 
   // Filtering and sorting
   const filteredAttendance = attendanceList
-    .filter(att =>
-      (typeof att.citizenNid === 'string' && att.citizenNid.toLowerCase().includes(search.toLowerCase()))
-    )
+    .filter(att => {
+      const citizen = (citizens || []).find(c =>
+        String(c.nationalId).trim() === String(att.citizenNid).trim() ||
+        String(c.nid).trim() === String(att.citizenNid).trim()
+      );
+      const name = (citizen?.fullName || citizen?.name || '').toLowerCase();
+      const nid = (citizen?.nationalId || citizen?.nid || '').toLowerCase();
+      const searchLower = search.toLowerCase();
+      return (
+        name.includes(searchLower) ||
+        nid.includes(searchLower) ||
+        (typeof att.citizenNid === 'string' && att.citizenNid.toLowerCase().includes(searchLower))
+      );
+    })
     .sort((a, b) => sortAsc ? a.citizenNid.localeCompare(b.citizenNid) : b.citizenNid.localeCompare(a.citizenNid));
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -38,6 +50,27 @@ const AttendanceManagement: React.FC = () => {
     await updateAttendance(currentSession.sessionId, citizenNid, currentStatus === 'Present' ? 'Absent' : 'Present', currentStatus === 'Absent' ? 5000 : undefined, currentStatus === 'Absent' ? 'Unpaid' : undefined);
     setSnackbarMsg('Attendance status updated!');
     setSnackbarOpen(true);
+  };
+
+  const handleDeleteAttendance = async (citizenNid: string) => {
+    if (!currentSession) return;
+    
+    try {
+      // Remove the citizen from the session's attendance list
+      const updatedAttendance = (currentSession.attendance || []).filter(a => a.citizenNid !== citizenNid);
+      
+      await updateSession(currentSession.sessionId, {
+        ...currentSession,
+        attendance: updatedAttendance,
+      });
+      
+      setSnackbarMsg('Attendance record deleted successfully!');
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('Error deleting attendance:', error);
+      setSnackbarMsg('Failed to delete attendance record.');
+      setSnackbarOpen(true);
+    }
   };
 
   const presentCount = attendanceList.filter(a => a.status === 'Present').length;
@@ -146,6 +179,7 @@ const AttendanceManagement: React.FC = () => {
                       <TableCell>National ID</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Action</TableCell>
+                      <TableCell>Delete</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -156,8 +190,8 @@ const AttendanceManagement: React.FC = () => {
                       );
                       return (
                         <TableRow key={row.citizenNid}>
-                          <TableCell>{citizen?.fullName || citizen?.name || row.citizenNid}</TableCell>
-                          <TableCell>{citizen?.nationalId || citizen?.nid || row.citizenNid}</TableCell>
+                          <TableCell>{citizen?.fullName || citizen?.name || 'Deleted'}</TableCell>
+                          <TableCell>{citizen?.nationalId || citizen?.nid || row.citizenNid || 'Unknown'}</TableCell>
                           <TableCell>
                             {row.status === 'Present' ? (
                               <Chip icon={<CheckCircleIcon color="success" />} label="Present" color="success" />
@@ -174,6 +208,17 @@ const AttendanceManagement: React.FC = () => {
                               onClick={() => handleToggleStatus(row.citizenNid, row.status)}
                             >
                               Mark {row.status === 'Present' ? 'Absent' : 'Present'}
+                            </Button>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              size="small"
+                              startIcon={<DeleteIcon />}
+                              onClick={() => handleDeleteAttendance(row.citizenNid)}
+                            >
+                              Delete
                             </Button>
                           </TableCell>
                         </TableRow>
