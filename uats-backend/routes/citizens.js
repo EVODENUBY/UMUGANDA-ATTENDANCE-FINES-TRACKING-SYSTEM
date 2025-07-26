@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Citizen = require('../models/citizen');
+const Fine = require('../models/fine');
 
 // Get all citizens
 router.get('/', async (req, res) => {
@@ -51,9 +52,16 @@ router.put('/:id', async (req, res) => {
 // Delete a citizen by _id
 router.delete('/:id', async (req, res) => {
   try {
+    // Find the citizen to get their nationalId/citizenId
+    const citizen = await Citizen.findById(req.params.id);
+    if (!citizen) return res.status(404).json({ error: 'Citizen not found' });
+    
+    // Delete all fines associated with this citizen
+    await Fine.deleteMany({ citizenId: citizen.nationalId });
+    
+    // Delete the citizen itself
     const deleted = await Citizen.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ error: 'Citizen not found' });
-    res.json({ message: 'Citizen deleted' });
+    res.json({ message: 'Citizen and associated fines deleted' });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

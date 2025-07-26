@@ -61,7 +61,7 @@ interface EditCitizenForm {
 const AdminPanel: React.FC = () => {
   const { user } = useAuth();
   const { sessions, addSession, updateSession, updateAttendance, deleteSession } = useSessions();
-  const { citizens } = useCitizens();
+  const { citizens, setCitizens } = useCitizens();
   const [sessionFilter, setSessionFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [newSession, setNewSession] = useState({ date: '', location: '' });
@@ -278,8 +278,11 @@ const AdminPanel: React.FC = () => {
         setSnackbarMsg('Citizen updated successfully!');
         setSnackbarColor('success');
         setSnackbarOpen(true);
-        fetchCitizens();
+        // Refresh citizens data and fines
+        await fetchCitizens();
+        await fetchFines();
       } catch (error) {
+        console.error('Update citizen error:', error);
         setSnackbarMsg('Failed to update citizen.');
         setSnackbarColor('error');
         setSnackbarOpen(true);
@@ -292,12 +295,15 @@ const AdminPanel: React.FC = () => {
     setLoadingDelete(true);
     const citizen = citizens[idx];
     try {
-      await axios.delete(`https://uats-backend.onrender.com//api/citizens/${citizen._id}`);
+      await axios.delete(`https://uats-backend.onrender.com/api/citizens/${citizen._id}`);
       setSnackbarMsg('Citizen deleted successfully!');
       setSnackbarColor('success');
       setSnackbarOpen(true);
-      fetchCitizens();
+      // Refresh citizens data and fines
+      await fetchCitizens();
+      await fetchFines();
     } catch (error) {
+      console.error('Delete citizen error:', error);
       setSnackbarMsg('Failed to delete citizen.');
       setSnackbarColor('error');
       setSnackbarOpen(true);
@@ -333,8 +339,10 @@ const AdminPanel: React.FC = () => {
   const fetchCitizens = async () => {
     try {
       const res = await axios.get<any[]>('https://uats-backend.onrender.com/api/citizens');
-      // setCitizens(res.data); // This line was removed as per the edit hint
+      // Update the citizens context with fresh data
+      setCitizens(res.data);
     } catch (err) {
+      console.error('Fetch citizens error:', err);
       // handle error, do not call setCitizens
     }
   };
