@@ -98,11 +98,16 @@ router.put('/:id', async (req, res) => {
 // Delete a session by _id
 router.delete('/:id', async (req, res) => {
   try {
-    // Find the session to get its sessionId
+    // Find the session to get its sessionId, date, and location
     const session = await Session.findById(req.params.id);
     if (!session) return res.status(404).json({ error: 'Session not found' });
-    // Delete all fines associated with this session
-    await Fine.deleteMany({ sessionId: session.sessionId });
+    // Delete all fines associated with this session (by sessionId or by sessionDate+sessionLocation)
+    await Fine.deleteMany({
+      $or: [
+        { sessionId: session.sessionId },
+        { sessionDate: session.date, sessionLocation: session.location }
+      ]
+    });
     // Delete the session itself
     const deleted = await Session.findByIdAndDelete(req.params.id);
     res.json({ message: 'Session and associated fines deleted' });

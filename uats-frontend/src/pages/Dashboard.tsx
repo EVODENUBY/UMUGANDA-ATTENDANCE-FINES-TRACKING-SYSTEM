@@ -345,14 +345,14 @@ const Dashboard: React.FC = () => {
                   <Avatar sx={{ bgcolor: 'primary.main', width: 64, height: 64, fontSize: 32, boxShadow: '0 2px 8px 0 rgba(44,83,100,0.18)' }}>
                     {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
                   </Avatar>
-                  <Box minWidth={0}>
-                    <Typography variant="h5" fontWeight={700} noWrap sx={{ color: 'primary.main', letterSpacing: 1 }}>
+                  <Box minWidth={0} sx={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
+                    <Typography variant="h5" fontWeight={700} sx={{ color: 'primary.main', letterSpacing: 1, wordWrap: 'break-word', whiteSpace: 'normal' }}>
                       {citizenInfo?.fullName || 'N/A'}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>Phone: <b>{citizenInfo?.phone || 'N/A'}</b></Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>National ID: <b>{citizenInfo?.nationalId || 'N/A'}</b></Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>Village: <b>{citizenInfo?.village || 'N/A'}</b></Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>Sector: <b>{citizenInfo?.sector || 'N/A'}</b></Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>Phone: <b>{citizenInfo?.phone || 'N/A'}</b></Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>National ID: <b>{citizenInfo?.nationalId || 'N/A'}</b></Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>Village: <b>{citizenInfo?.village || 'N/A'}</b></Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>Sector: <b>{citizenInfo?.sector || 'N/A'}</b></Typography>
                   </Box>
                 </Box>
               </Box>

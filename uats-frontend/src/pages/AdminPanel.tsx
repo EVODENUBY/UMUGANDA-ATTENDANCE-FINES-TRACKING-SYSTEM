@@ -669,14 +669,14 @@ const AdminPanel: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Full Name</TableCell>
-                  <TableCell>National ID</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Village</TableCell>
-                  <TableCell>Sector</TableCell>
-                  <TableCell>Username</TableCell>
-                  <TableCell>Password</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '150px' }}>Full Name</TableCell>
+                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>National ID</TableCell>
+                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>Phone</TableCell>
+                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>Village</TableCell>
+                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>Sector</TableCell>
+                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>Username</TableCell>
+                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>Password</TableCell>
+                  <TableCell sx={{ minWidth: '120px' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -684,28 +684,28 @@ const AdminPanel: React.FC = () => {
                   <TableRow key={idx}>
                     {editIdx === idx ? (
                       <>
-                        <TableCell><TextField name="fullName" value={editForm.fullName} onChange={handleEditFormChange} /></TableCell>
-                        <TableCell><TextField name="nationalId" value={editForm.nationalId} onChange={handleEditFormChange} /></TableCell>
-                        <TableCell><TextField name="phone" value={editForm.phone} onChange={handleEditFormChange} /></TableCell>
-                        <TableCell><TextField name="village" value={editForm.village} onChange={handleEditFormChange} /></TableCell>
-                        <TableCell><TextField name="sector" value={editForm.sector} onChange={handleEditFormChange} /></TableCell>
-                        <TableCell><TextField name="username" value={editForm.username} InputProps={{ readOnly: true }} /></TableCell>
-                        <TableCell><TextField name="password" value={editForm.password} InputProps={{ readOnly: true }} /></TableCell>
-                        <TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '150px' }}><TextField name="fullName" value={editForm.fullName} onChange={handleEditFormChange} size="small" /></TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="nationalId" value={editForm.nationalId} onChange={handleEditFormChange} size="small" /></TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="phone" value={editForm.phone} onChange={handleEditFormChange} size="small" /></TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="village" value={editForm.village} onChange={handleEditFormChange} size="small" /></TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="sector" value={editForm.sector} onChange={handleEditFormChange} size="small" /></TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="username" value={editForm.username} InputProps={{ readOnly: true }} size="small" /></TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="password" value={editForm.password} InputProps={{ readOnly: true }} size="small" /></TableCell>
+                        <TableCell sx={{ minWidth: '120px' }}>
                           <Button color="success" size="small" onClick={handleSaveEdit} disabled={loadingEdit}>Save</Button>
                           <Button color="inherit" size="small" onClick={() => setEditIdx(null)} disabled={loadingEdit}>Cancel</Button>
                         </TableCell>
                       </>
                     ) : (
                       <>
-                        <TableCell>{cit.fullName}</TableCell>
-                        <TableCell>{cit.nationalId}</TableCell>
-                        <TableCell>{cit.phone}</TableCell>
-                        <TableCell>{cit.village}</TableCell>
-                        <TableCell>{cit.sector}</TableCell>
-                        <TableCell>{cit.username}</TableCell>
-                        <TableCell>{cit.password}</TableCell>
-                        <TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '150px', whiteSpace: 'normal' }}>{cit.fullName}</TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.nationalId}</TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.phone}</TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.village}</TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.sector}</TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.username}</TableCell>
+                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.password}</TableCell>
+                        <TableCell sx={{ minWidth: '120px' }}>
                           {isAdmin && (
                             <>
                               <Button color="primary" size="small" onClick={() => handleEditCitizen(idx)} disabled={loadingEdit || loadingDelete}>Edit</Button>
