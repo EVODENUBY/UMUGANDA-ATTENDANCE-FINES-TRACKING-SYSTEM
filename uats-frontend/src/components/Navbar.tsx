@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
           </ListItemButton>
         </ListItem>
       )}
-      {/* Always show Admin Panel and Attendance for admin/leader/official when authenticated */}
+      {/* Always show Admin Panel and Attendance for admin/leader when authenticated */}
       {isAuthenticated && (user?.role === 'leader' || user?.role === 'official' || user?.role === 'admin') && (
         <>
           <ListItem disablePadding>
@@ -134,7 +134,7 @@ const Navbar: React.FC = () => {
             )}
           </Box>
         )}
-        {/* Drawer for small screens */}
+        {/* Drawer Menu  for small screens */}
         <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)} key={String(isAuthenticated) + (user?.role || '')}>
           <Box sx={{ width: 220 }} role="presentation" onClick={() => setDrawerOpen(false)}>
             <List>{menuLinks}</List>

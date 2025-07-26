@@ -3,6 +3,8 @@
 UATS is a full-stack web application designed to manage Umuganda (community service) attendance, automate fine management for absentees and managing attendees, and make payment tracking and analytics for Local citizens. It supports both Local leaders and citizens, providing real-time updates on Umuganda attendance, payment integration, Fines payment and a modern, responsive UI.
 
 ---
+## View live project: https://umuganda-tracking-system.vercel.app
+## Backend link: https://uats-backend.onrender.com/
 
 ## DEMO ACCOUNTS TO TEST:
   - **Admin**:
@@ -10,7 +12,8 @@ UATS is a full-stack web application designed to manage Umuganda (community serv
       - PassWord:        evode@123 
   -  **Citizen**:
       - National ID: 1200380097272049
-      - Password:    UATS@2049ixa05f	    ##dont use spaces write it as it is. And citizen Account can also register his/her account and then after successful login directed to cictizen dashboard.
+      - Password:    UATS@2049ixa05f	    
+      ## dont use whitespaces write it as it is. And citizen Account can also register his/her account and then after successful login directed to cictizen dashboard.
 
   -  
 ## Features

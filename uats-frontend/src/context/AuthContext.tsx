@@ -55,7 +55,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
-  // Remove signup logic for citizens, as registration is handled in Signup page via CitizenContext
   const signup = async (_data: any) => {
     // No-op for citizens, handled in Signup page
     return true;
