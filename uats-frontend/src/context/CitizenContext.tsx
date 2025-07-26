@@ -21,6 +21,7 @@ interface CitizenContextType {
   updateCitizen: (idx: number, citizen: Citizen) => void;
   deleteCitizen: (idx: number) => void;
   setCitizens: (citizens: Citizen[]) => void;
+  refreshCitizens: () => Promise<void>;
 }
 
 const CitizenContext = createContext<CitizenContextType | undefined>(undefined);
@@ -52,15 +53,14 @@ export const CitizenProvider = ({ children }: { children: ReactNode }) => {
           }))
         );
       } catch (err) {
-        // handle error
+        console.error('Error fetching citizens:', err);
       }
     };
     fetchCitizens();
   }, []);
 
-  const addCitizen = async (citizen: Citizen) => {
+  const refreshCitizens = async () => {
     try {
-      await axios.post('https://uats-backend.onrender.com/api/citizens', citizen);
       const res = await axios.get('https://uats-backend.onrender.com/api/citizens');
       setCitizens(
         (res.data as Citizen[]).map(c => ({
@@ -72,50 +72,46 @@ export const CitizenProvider = ({ children }: { children: ReactNode }) => {
         }))
       );
     } catch (err) {
-      // handle error
+      console.error('Error refreshing citizens:', err);
     }
   };
+
+  const addCitizen = async (citizen: Citizen) => {
+    try {
+      await axios.post('https://uats-backend.onrender.com/api/citizens', citizen);
+      await refreshCitizens();
+    } catch (err) {
+      console.error('Error adding citizen:', err);
+      throw err;
+    }
+  };
+  
   const updateCitizen = async (idx: number, citizen: Citizen) => {
     try {
       const id = citizens[idx]?._id;
       if (!id) return;
       await axios.put(`https://uats-backend.onrender.com/api/citizens/${id}`, citizen);
-      const res = await axios.get('https://uats-backend.onrender.com/api/citizens');
-      setCitizens(
-        (res.data as Citizen[]).map(c => ({
-          ...c,
-          nationalId: c.nationalId || c.nid,
-          nid: c.nid || c.nationalId,
-          fullName: c.fullName || c.name,
-          name: c.name || c.fullName,
-        }))
-      );
+      await refreshCitizens();
     } catch (err) {
-      // handle error
+      console.error('Error updating citizen:', err);
+      throw err;
     }
   };
+  
   const deleteCitizen = async (idx: number) => {
     try {
       const id = citizens[idx]?._id;
       if (!id) return;
       await axios.delete(`https://uats-backend.onrender.com/api/citizens/${id}`);
-      const res = await axios.get('https://uats-backend.onrender.com/api/citizens');
-      setCitizens(
-        (res.data as Citizen[]).map(c => ({
-          ...c,
-          nationalId: c.nationalId || c.nid,
-          nid: c.nid || c.nationalId,
-          fullName: c.fullName || c.name,
-          name: c.name || c.fullName,
-        }))
-      );
+      await refreshCitizens();
     } catch (err) {
-      // handle error
+      console.error('Error deleting citizen:', err);
+      throw err;
     }
   };
 
   return (
-    <CitizenContext.Provider value={{ citizens, addCitizen, updateCitizen, deleteCitizen, setCitizens }}>
+    <CitizenContext.Provider value={{ citizens, addCitizen, updateCitizen, deleteCitizen, setCitizens, refreshCitizens }}>
       {children}
     </CitizenContext.Provider>
   );

@@ -61,7 +61,7 @@ interface EditCitizenForm {
 const AdminPanel: React.FC = () => {
   const { user } = useAuth();
   const { sessions, addSession, updateSession, updateAttendance, deleteSession } = useSessions();
-  const { citizens, setCitizens } = useCitizens();
+  const { citizens, refreshCitizens, updateCitizen, deleteCitizen, addCitizen } = useCitizens();
   const [sessionFilter, setSessionFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [newSession, setNewSession] = useState({ date: '', location: '' });
@@ -226,12 +226,11 @@ const AdminPanel: React.FC = () => {
       password: newPassword,
     };
     try {
-      await axios.post('https://uats-backend.onrender.com/api/citizens', newCitizen);
+      await addCitizen(newCitizen);
       setCitizenForm({ name: '', nid: '', phone: '', village: '', sector: '' });
       setSnackbarMsg('Citizen registered successfully!');
       setSnackbarColor('success');
       setSnackbarOpen(true);
-      fetchCitizens(); // Refresh table
       await addCitizenToSessions(newCitizen); // Add to all sessions
     } catch (error) {
       setSnackbarMsg('Failed to register citizen.');
@@ -260,26 +259,25 @@ const AdminPanel: React.FC = () => {
   const handleSaveEdit = async () => {
     if (editIdx !== null) {
       setLoadingEdit(true);
-      const citizen = citizens[editIdx];
-      // Build update payload with all required fields
-      const updatedCitizen = {
-        citizenId: editForm.citizenId,
-        fullName: editForm.fullName,
-        nationalId: editForm.nationalId,
-        phone: editForm.phone,
-        village: editForm.village,
-        sector: editForm.sector,
-        username: editForm.username,
-        password: editForm.password,
-      };
       try {
-        await axios.put(`https://uats-backend.onrender.com/api/citizens/${citizen._id}`, updatedCitizen);
+        // Build update payload with all required fields
+        const updatedCitizen = {
+          citizenId: editForm.citizenId,
+          fullName: editForm.fullName,
+          nationalId: editForm.nationalId,
+          phone: editForm.phone,
+          village: editForm.village,
+          sector: editForm.sector,
+          username: editForm.username,
+          password: editForm.password,
+        };
+        
+        await updateCitizen(editIdx, updatedCitizen);
         setEditIdx(null);
         setSnackbarMsg('Citizen updated successfully!');
         setSnackbarColor('success');
         setSnackbarOpen(true);
-        // Refresh citizens data and fines
-        await fetchCitizens();
+        // Refresh fines after citizen update
         await fetchFines();
       } catch (error) {
         console.error('Update citizen error:', error);
@@ -293,14 +291,12 @@ const AdminPanel: React.FC = () => {
   };
   const handleDeleteCitizen = async (idx: number) => {
     setLoadingDelete(true);
-    const citizen = citizens[idx];
     try {
-      await axios.delete(`https://uats-backend.onrender.com/api/citizens/${citizen._id}`);
+      await deleteCitizen(idx);
       setSnackbarMsg('Citizen deleted successfully!');
       setSnackbarColor('success');
       setSnackbarOpen(true);
-      // Refresh citizens data and fines
-      await fetchCitizens();
+      // Refresh fines after citizen deletion
       await fetchFines();
     } catch (error) {
       console.error('Delete citizen error:', error);
@@ -338,12 +334,9 @@ const AdminPanel: React.FC = () => {
   // Fetch citizens from backend
   const fetchCitizens = async () => {
     try {
-      const res = await axios.get<any[]>('https://uats-backend.onrender.com/api/citizens');
-      // Update the citizens context with fresh data
-      setCitizens(res.data);
+      await refreshCitizens();
     } catch (err) {
       console.error('Fetch citizens error:', err);
-      // handle error, do not call setCitizens
     }
   };
 
