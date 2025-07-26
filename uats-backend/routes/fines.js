@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const Fine = require('../models/fine');
+
 // Get all fines
 router.get('/', async (req, res) => {
   const fines = await Fine.find();
   res.json(fines);
 });
+
 // Add a new fine
 router.post('/', async (req, res) => {
   try {
@@ -16,6 +18,7 @@ router.post('/', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
 // Update a fine by citizenId and sessionId
 router.put('/', async (req, res) => {
   try {
@@ -41,4 +44,16 @@ router.put('/', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+// Delete a fine by _id
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await Fine.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Fine not found' });
+    res.json({ message: 'Fine deleted successfully' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 module.exports = router; 

@@ -38,6 +38,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 // Add a type for fine row
 export interface FineRow {
+  id: string;
   user: string;
   date: string;
   amount: number;
@@ -60,7 +61,7 @@ interface EditCitizenForm {
 
 const AdminPanel: React.FC = () => {
   const { user } = useAuth();
-  const { sessions, addSession, updateSession, updateAttendance, deleteSession } = useSessions();
+  const { sessions, addSession, updateSession, updateAttendance, deleteSession, fetchSessions } = useSessions();
   const { citizens, refreshCitizens, updateCitizen, deleteCitizen, addCitizen } = useCitizens();
   const [sessionFilter, setSessionFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
@@ -254,7 +255,15 @@ const AdminPanel: React.FC = () => {
     });
   };
   const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setEditForm(prev => {
+      const updated = { ...prev, [name]: value };
+      // Auto-update username when national ID changes
+      if (name === 'nationalId') {
+        updated.username = value;
+      }
+      return updated;
+    });
   };
   const handleSaveEdit = async () => {
     if (editIdx !== null) {
@@ -296,8 +305,10 @@ const AdminPanel: React.FC = () => {
       setSnackbarMsg('Citizen deleted successfully!');
       setSnackbarColor('success');
       setSnackbarOpen(true);
-      // Refresh fines after citizen deletion
+      // Refresh fines and sessions after citizen deletion
       await fetchFines();
+      // Refresh sessions to update attendance lists
+      await fetchSessions();
     } catch (error) {
       console.error('Delete citizen error:', error);
       setSnackbarMsg('Failed to delete citizen.');
@@ -422,6 +433,21 @@ const AdminPanel: React.FC = () => {
     fetchFines(); // Refetch fines after override
   };
 
+  const handleDeleteFine = async (fineId: string) => {
+    try {
+      await axios.delete(`https://uats-backend.onrender.com/api/fines/${fineId}`);
+      setSnackbarMsg('Fine deleted successfully!');
+      setSnackbarColor('success');
+      setSnackbarOpen(true);
+      fetchFines(); // Refetch fines after deletion
+    } catch (error) {
+      console.error('Delete fine error:', error);
+      setSnackbarMsg('Failed to delete fine.');
+      setSnackbarColor('error');
+      setSnackbarOpen(true);
+    }
+  };
+
   // Add a function to delete an attendance record for a citizen in a session
   const handleDeleteAttendance = (sessionId: string, citizenNid: string) => {
     const session = sessions.find(s => s.sessionId === sessionId);
@@ -509,6 +535,7 @@ const AdminPanel: React.FC = () => {
         finesArray = res.data;
       }
       setFines(finesArray.map((fine: any) => ({
+        id: fine._id, // Add fine ID for deletion
         user: citizens.find((c: any) => c.nid === fine.citizenId)?.name || fine.citizenId,
         date: new Date(fine.sessionDate).toLocaleDateString(),
         amount: fine.amount,
@@ -517,7 +544,7 @@ const AdminPanel: React.FC = () => {
         citizenNid: fine.citizenId,
       })));
     } catch (err) {
-      // handle error
+      console.error('Fetch fines error:', err);
     }
   };
   useEffect(() => {
@@ -670,14 +697,14 @@ const AdminPanel: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '150px' }}>Full Name</TableCell>
-                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>National ID</TableCell>
-                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>Phone</TableCell>
-                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>Village</TableCell>
-                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>Sector</TableCell>
-                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>Username</TableCell>
-                  <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}>Password</TableCell>
-                  <TableCell sx={{ minWidth: '120px' }}>Actions</TableCell>
+                  <TableCell>Full Name</TableCell>
+                  <TableCell>National ID</TableCell>
+                  <TableCell>Phone</TableCell>
+                  <TableCell>Village</TableCell>
+                  <TableCell>Sector</TableCell>
+                  <TableCell>Username</TableCell>
+                  <TableCell>Password</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -685,28 +712,28 @@ const AdminPanel: React.FC = () => {
                   <TableRow key={idx}>
                     {editIdx === idx ? (
                       <>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '150px' }}><TextField name="fullName" value={editForm.fullName} onChange={handleEditFormChange} size="small" /></TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="nationalId" value={editForm.nationalId} onChange={handleEditFormChange} size="small" /></TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="phone" value={editForm.phone} onChange={handleEditFormChange} size="small" /></TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="village" value={editForm.village} onChange={handleEditFormChange} size="small" /></TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="sector" value={editForm.sector} onChange={handleEditFormChange} size="small" /></TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="username" value={editForm.username} InputProps={{ readOnly: true }} size="small" /></TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px' }}><TextField name="password" value={editForm.password} InputProps={{ readOnly: true }} size="small" /></TableCell>
-                        <TableCell sx={{ minWidth: '120px' }}>
+                        <TableCell><TextField name="fullName" value={editForm.fullName} onChange={handleEditFormChange} size="small" /></TableCell>
+                        <TableCell><TextField name="nationalId" value={editForm.nationalId} onChange={handleEditFormChange} size="small" /></TableCell>
+                        <TableCell><TextField name="phone" value={editForm.phone} onChange={handleEditFormChange} size="small" /></TableCell>
+                        <TableCell><TextField name="village" value={editForm.village} onChange={handleEditFormChange} size="small" /></TableCell>
+                        <TableCell><TextField name="sector" value={editForm.sector} onChange={handleEditFormChange} size="small" /></TableCell>
+                        <TableCell><TextField name="username" value={editForm.username} InputProps={{ readOnly: true }} size="small" /></TableCell>
+                        <TableCell><TextField name="password" value={editForm.password} InputProps={{ readOnly: true }} size="small" /></TableCell>
+                        <TableCell>
                           <Button color="success" size="small" onClick={handleSaveEdit} disabled={loadingEdit}>Save</Button>
                           <Button color="inherit" size="small" onClick={() => setEditIdx(null)} disabled={loadingEdit}>Cancel</Button>
                         </TableCell>
                       </>
                     ) : (
                       <>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '150px', whiteSpace: 'normal' }}>{cit.fullName}</TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.nationalId}</TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.phone}</TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.village}</TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.sector}</TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.username}</TableCell>
-                        <TableCell sx={{ wordWrap: 'break-word', maxWidth: '120px', whiteSpace: 'normal' }}>{cit.password}</TableCell>
-                        <TableCell sx={{ minWidth: '120px' }}>
+                        <TableCell>{cit.fullName}</TableCell>
+                        <TableCell>{cit.nationalId}</TableCell>
+                        <TableCell>{cit.phone}</TableCell>
+                        <TableCell>{cit.village}</TableCell>
+                        <TableCell>{cit.sector}</TableCell>
+                        <TableCell>{cit.username}</TableCell>
+                        <TableCell>{cit.password}</TableCell>
+                        <TableCell>
                           {isAdmin && (
                             <>
                               <Button color="primary" size="small" onClick={() => handleEditCitizen(idx)} disabled={loadingEdit || loadingDelete}>Edit</Button>
@@ -890,6 +917,7 @@ const AdminPanel: React.FC = () => {
                 <TableCell>Amount</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Override</TableCell>
+                <TableCell>Delete</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -908,6 +936,11 @@ const AdminPanel: React.FC = () => {
                   <TableCell>
                     <Button variant="outlined" color={row.status === 'Paid' ? 'success' : 'warning'} size="small" startIcon={<EditIcon />} onClick={() => handleOverride(row)}>
                       {row.status === 'Paid' ? 'Mark Unpaid' : 'Mark Paid'}
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="outlined" color="error" size="small" startIcon={<DeleteIcon />} onClick={() => handleDeleteFine(row.id)}>
+                      Delete
                     </Button>
                   </TableCell>
                 </TableRow>

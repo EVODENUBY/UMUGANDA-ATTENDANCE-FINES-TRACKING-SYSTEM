@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Citizen = require('../models/citizen');
 const Fine = require('../models/fine');
+const Session = require('../models/session');
 
 // Get all citizens
 router.get('/', async (req, res) => {
@@ -59,9 +60,15 @@ router.delete('/:id', async (req, res) => {
     // Delete all fines associated with this citizen
     await Fine.deleteMany({ citizenId: citizen.nationalId });
     
+    // Remove citizen from all session attendance lists
+    await Session.updateMany(
+      {},
+      { $pull: { attendance: { citizenNid: citizen.nationalId } } }
+    );
+    
     // Delete the citizen itself
     const deleted = await Citizen.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Citizen and associated fines deleted' });
+    res.json({ message: 'Citizen and associated data deleted' });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
