@@ -812,7 +812,6 @@ const AdminPanel: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {(session.attendance || [])
-                    .filter(a => citizens.some(c => c.nid === a.citizenNid))
                     .slice((attendancePage[session.sessionId] || 0) * (attendanceRowsPerPage[session.sessionId] || 5), (attendancePage[session.sessionId] || 0) * (attendanceRowsPerPage[session.sessionId] || 5) + (attendanceRowsPerPage[session.sessionId] || 5))
                     .map(a => {
                       const citizen = (citizens || []).find(c =>
@@ -821,8 +820,8 @@ const AdminPanel: React.FC = () => {
                       );
                       return (
                         <TableRow key={a.citizenNid}>
-                          <TableCell>{citizen?.fullName || citizen?.name || a.citizenNid}</TableCell>
-                          <TableCell>{citizen?.nationalId || citizen?.nid || a.citizenNid}</TableCell>
+                          <TableCell>{citizen?.fullName || citizen?.name || 'Deleted'}</TableCell>
+                          <TableCell>{citizen?.nationalId || citizen?.nid || a.citizenNid || 'Unknown'}</TableCell>
                           <TableCell>
                             <Button size="small" color={a.status === 'Present' ? 'success' : 'error'} variant={a.status === 'Present' ? 'contained' : 'outlined'} onClick={() => handleAttendanceChange(session.sessionId, a.citizenNid, a.status === 'Present' ? 'Absent' : 'Present')}>
                               {a.status}
